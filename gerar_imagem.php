@@ -2,7 +2,8 @@
 // Caminho para a imagem base
 $imagemBase = 'ranking.png';
 $image = imagecreatefrompng($imagemBase);
-
+$posicao = $_GET['posicao'];
+$pontuacao = $_GET['pontuacao'];
 
 
 // Define cor e fonte
@@ -22,8 +23,8 @@ $lineHeight = 30;
 // Escreve o texto linha por linha
 foreach (explode("\n", $texto) as $linha) {
     imagettftext($image, 50, 0, $x, $y, $corTexto, $fonte, $linha);
-    //imagestring($image, 5, $x, $y, "Posição: 1", $corTexto);
-    //imagestring($image, 5, $x, $y + 20, "Pontuação: 850", $corTexto);
+    //imagestring($image, 5, $x, $y, "Posição: ".$posicao, $corTexto);
+    //imagestring($image, 5, $x, $y + 20, "Pontuação: ".$pontuacao, $corTexto);
     $y += $lineHeight;
 }
 
