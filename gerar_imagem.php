@@ -13,7 +13,7 @@ if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
 
 // Texto personalizado
-$texto = "Posição: 1\n\n\n\nPontuação: 850";
+$texto = "Posição: $posicao\n\n\n\nPontuação: $pontuacao";
 
 // Posição inicial
 $x = 250;
@@ -23,8 +23,8 @@ $lineHeight = 30;
 // Escreve o texto linha por linha
 foreach (explode("\n", $texto) as $linha) {
     imagettftext($image, 50, 0, $x, $y, $corTexto, $fonte, $linha);
-    //imagestring($image, 5, $x, $y, "Posição: ".$posicao, $corTexto);
-    //imagestring($image, 5, $x, $y + 20, "Pontuação: ".$pontuacao, $corTexto);
+    //imagestring($image, 5, $x, $y, "Posição: ", $corTexto);
+    //imagestring($image, 5, $x, $y + 20, "Pontuação: ", $corTexto);
     $y += $lineHeight;
 }
 
