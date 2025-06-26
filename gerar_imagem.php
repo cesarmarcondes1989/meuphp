@@ -8,6 +8,8 @@ $image = imagecreatefrompng($imagemBase);
 // Define cor e fonte
 $corTexto = imagecolorallocate($image, 101, 67, 33);
 $fonte = __DIR__ . '/fonte_usar.ttf'; // Certifique-se que arial.ttf está no mesmo diretório
+if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
+
 
 // Texto personalizado
 $texto = "Posição: 1\n\n\n\nPontuação: 850";
