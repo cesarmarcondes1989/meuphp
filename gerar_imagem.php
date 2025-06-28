@@ -2,7 +2,7 @@
 // Caminho para a imagem base
 $imagemBase = 'ranking.png';
 $image = imagecreatefrompng($imagemBase);
-$posicao = $_GET['posicao'];
+$posicao = round($_GET['posicao']);
 $pontuacao = $_GET['pontuacao'];
 
 
