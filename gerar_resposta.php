@@ -3,23 +3,24 @@
 $imagemBase = 'resposta.png';
 $image = imagecreatefrompng($imagemBase);
 
+// Inputs via GET
 $msgusuario = $_GET['msg_usuario'] ?? '';
 $msgcorrigida = $_GET['msg_corrigida'] ?? '';
 $sugestao = $_GET['sugestao'] ?? '';
 $score = $_GET['score'] ?? '';
+
+$tamanhoFonte = isset($_GET['size']) ? intval($_GET['size']) : 12;
+$x = isset($_GET['x']) ? intval($_GET['x']) : 110;
+$y = isset($_GET['y']) ? intval($_GET['y']) : 500;
+
+$lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
 
 // Define cor e fonte
 $corTexto = imagecolorallocate($image, 101, 67, 33);
 $fonte = __DIR__ . '/fonte_usar.ttf';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
-// Tamanho e espaçamento
-$tamanhoFonte = 12;
-$lineHeight = 28;
-$x = 60;
-$y = 500;
-
-// Função auxiliar para escrever bloco com título + conteúdo
+// Função auxiliar para escrever texto com quebra de linha automática
 function escreveBloco($titulo, $conteudo, &$x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight) {
     imagettftext($image, $tamanhoFonte + 1, 0, $x, $y, $corTexto, $fonte, $titulo);
     $y += $lineHeight;
@@ -35,17 +36,10 @@ escreveBloco("🗣 Mensagem do Usuário:", $msgusuario, $x, $y, $image, $fonte, 
 escreveBloco("✅ Correção:", $msgcorrigida, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
 escreveBloco("💡 Sugestão:", $sugestao, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
 
-// Salvar imagem
-ob_start();
-imagepng($image);
-$imagemFinal = ob_get_clean();
-imagedestroy($image);
-
-// Retorna para download
+// Mostrar imagem na tela
 header('Content-Type: image/png');
-header('Content-Disposition: attachment; filename="resposta_usuario.png"');
-header('Content-Length: ' . strlen($imagemFinal));
-echo $imagemFinal;
+imagepng($image);
+imagedestroy($image);
 exit;
 ?>
 
