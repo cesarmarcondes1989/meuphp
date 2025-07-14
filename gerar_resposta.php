@@ -46,8 +46,9 @@ escreveBloco("", $score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $li
 
 // Mostrar imagem na tela
 header('Content-Type: image/png');
-imagepng($image);
-imagedestroy($image);
+header('Content-Disposition: attachment; filename="resposta_usuario.png"');
+header('Content-Length: ' . strlen($imagemFinal));
+echo $imagemFinal;
 exit;
 ?>
 
