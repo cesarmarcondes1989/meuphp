@@ -101,8 +101,9 @@ $imagemFinal = ob_get_clean();
 imagedestroy($image);
 
 // Mostrar imagem na tela
+// Mostrar imagem na tela
 header('Content-Type: image/png');
-header('Content-Disposition: inline; filename="resposta_usuario.png"');
+header('Content-Disposition: attachment; filename="resposta_usuario.png"');
 header('Content-Length: ' . strlen($imagemFinal));
 echo $imagemFinal;
 exit;
