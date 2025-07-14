@@ -14,7 +14,7 @@ $x = isset($_GET['x']) ? intval($_GET['x']) : 110;
 $y = isset($_GET['y']) ? intval($_GET['y']) : 1000;
 $y2 = isset($_GET['y2']) ? intval($_GET['y2']) : 3000;
 $x3 = isset($_GET['x3']) ? intval($_GET['x3']) : 500;
-$yy = isset($_GET['y3']) ? intval($_GET['y3']) : 1000;
+$y3 = isset($_GET['y3']) ? intval($_GET['y3']) : 1000;
 
 $lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
 
@@ -23,12 +23,16 @@ $corTexto = imagecolorallocate($image, 101, 67, 33);
 $fonte = __DIR__ . '/ARIALN.TTF';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
-// Função auxiliar para escrever texto com quebra de linha automática
+// Função segura para escrever blocos de texto
 function escreveBloco($titulo, $conteudo, &$x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight) {
-    imagettftext($image, $tamanhoFonte + 1, 0, $x, $y, $corTexto, $fonte, $titulo);
-    $y += $lineHeight;
+    $y = intval($y); // Garante que $y seja sempre inteiro
+    if (!empty($titulo)) {
+        imagettftext($image, $tamanhoFonte + 1, 0, intval($x), $y, $corTexto, $fonte, $titulo);
+        $y += $lineHeight;
+    }
+
     foreach (explode("\n", wordwrap($conteudo, 80, "\n")) as $linha) {
-        imagettftext($image, $tamanhoFonte, 0, $x + 10, $y, $corTexto, $fonte, $linha);
+        imagettftext($image, $tamanhoFonte, 0, intval($x + 10), $y, $corTexto, $fonte, $linha);
         $y += $lineHeight;
     }
     $y += 10;
