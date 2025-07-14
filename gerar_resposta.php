@@ -21,7 +21,7 @@ $lineHeight = $tamanhoFonte + 14;
 // Define cores e fonte
 $corTexto = imagecolorallocate($image, 101, 67, 33); // marrom escuro
 $corErro = imagecolorallocate($image, 200, 30, 30); // vermelho para palavras erradas
-$fonte = __DIR__ . '/DejaVuSans.ttf'; // Use uma fonte boa para centralizar corretamente
+$fonte = __DIR__ . '/roboto.ttf'; // Use uma fonte boa para centralizar corretamente
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
 // Função para escrever texto com estilo (negrito e strike vermelho)
