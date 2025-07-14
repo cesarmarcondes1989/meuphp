@@ -15,7 +15,6 @@ $y = isset($_GET['y']) ? intval($_GET['y']) : 700;
 $y2 = isset($_GET['y2']) ? intval($_GET['y2']) : 1750;
 $x3 = isset($_GET['x3']) ? intval($_GET['x3']) : 1170;
 $y3 = isset($_GET['y3']) ? intval($_GET['y3']) : 515;
-$y4 = isset($_GET['y4']) ? intval($_GET['y4']) : 515;
 
 $lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
 
@@ -25,24 +24,76 @@ $fonte = __DIR__ . '/ARIALN.TTF';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
 // Função segura para escrever blocos de texto
-function escreveBloco($titulo, $conteudo, &$x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight) {
-    $y = intval($y); // Garante que $y seja sempre inteiro
-    if (!empty($titulo)) {
-        imagettftext($image, $tamanhoFonte + 1, 0, intval($x), $y, $corTexto, $fonte, $titulo);
-        $y += $lineHeight;
+function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1000) {
+    $palavras = explode(' ', $conteudo);
+    $linha = '';
+    
+    foreach ($palavras as $palavra) {
+        $teste = trim($linha . ' ' . $palavra);
+        $bbox = imagettfbbox($tamanhoFonte, 0, $fonte, $teste);
+        $largura = abs($bbox[2] - $bbox[0]);
+
+        if ($largura > $maxWidth) {
+            desenhaLinhaComEstilo(trim($linha), $x, $y, $image, $fonte, $tamanhoFonte, $corTexto);
+            $y += $lineHeight;
+            $linha = $palavra;
+        } else {
+            $linha .= ' ' . $palavra;
+        }
     }
 
-    foreach (explode("\n", wordwrap($conteudo, 80, "\n")) as $linha) {
-        imagettftext($image, $tamanhoFonte, 0, intval($x + 10), $y, $corTexto, $fonte, $linha);
+    if (!empty($linha)) {
+        desenhaLinhaComEstilo(trim($linha), $x, $y, $image, $fonte, $tamanhoFonte, $corTexto);
         $y += $lineHeight;
     }
-    $y += 10;
 }
 
+// Essa função desenha a linha interpretando *negrito* e ~risco~
+function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto) {
+    // Divide a linha em partes com ou sem estilo
+    $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $offsetX = $x;
+
+    foreach ($parts as $parte) {
+        $estilo = 'normal';
+
+        if (preg_match('/^\*(.*?)\*$/', $parte, $m)) {
+            $texto = $m[1];
+            $estilo = 'bold';
+        } elseif (preg_match('/^~(.*?)~$/', $parte, $m)) {
+            $texto = $m[1];
+            $estilo = 'strike';
+        } else {
+            $texto = $parte;
+        }
+
+        // Medir tamanho da palavra
+        $bbox = imagettfbbox($tamanhoFonte, 0, $fonte, $texto);
+        $larguraTexto = abs($bbox[2] - $bbox[0]);
+
+        // Desenhar com estilo
+        if ($estilo === 'bold') {
+            // Negrito falso: desenha 2x com deslocamento
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
+            imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corTexto, $fonte, $texto);
+        } elseif ($estilo === 'strike') {
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
+            // Desenha risco no meio da palavra
+            $linhaY = $y - $tamanhoFonte / 2;
+            imageline($image, $offsetX, $linhaY, $offsetX + $larguraTexto, $linhaY, $corTexto);
+        } else {
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
+        }
+
+        $offsetX += $larguraTexto + 8; // espaço entre palavras
+    }
+}
+
+
 // Escrever blocos na imagem
-escreveBloco("", $msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
-escreveBloco("", $msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
-escreveBloco("", $score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
+escreveTextoFormatadoComEstilo($msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
+escreveTextoFormatadoComEstilo($msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
+escreveTextoFormatadoComEstilo($msgcorrigida, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
 
 // Mostrar imagem na tela
 header('Content-Type: image/png');
