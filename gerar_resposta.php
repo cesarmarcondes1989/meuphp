@@ -4,27 +4,27 @@ $imagemBase = 'resposta.png';
 $image = imagecreatefrompng($imagemBase);
 
 // Inputs via GET
-$msgusuario = $_GET['msg_usuario'] ?? '';
+$msgusuario   = $_GET['msg_usuario'] ?? '';
 $msgcorrigida = $_GET['msg_corrigida'] ?? '';
-$sugestao = $_GET['sugestao'] ?? '';
-$score = $_GET['score'] ?? '';
+$sugestao     = $_GET['sugestao'] ?? '';
+$score        = $_GET['score'] ?? '';
 
 $tamanhoFonte = isset($_GET['size']) ? intval($_GET['size']) : 50;
-$x = isset($_GET['x']) ? intval($_GET['x']) : 210;
-$y = isset($_GET['y']) ? intval($_GET['y']) : 700;
-$y2 = isset($_GET['y2']) ? intval($_GET['y2']) : 1750;
-$x3 = isset($_GET['x3']) ? intval($_GET['x3']) : 1170;
-$y3 = isset($_GET['y3']) ? intval($_GET['y3']) : 515;
+$x            = isset($_GET['x']) ? intval($_GET['x']) : 210;
+$y            = isset($_GET['y']) ? intval($_GET['y']) : 700;
+$y2           = isset($_GET['y2']) ? intval($_GET['y2']) : 1750;
+$x3           = isset($_GET['x3']) ? intval($_GET['x3']) : 1170;
+$y3           = isset($_GET['y3']) ? intval($_GET['y3']) : 515;
 
-$lineHeight = $tamanhoFonte + 14;
+$lineHeight   = $tamanhoFonte + 14;
 
 // Define cores e fonte
-$corTexto = imagecolorallocate($image, 101, 67, 33); // marrom escuro
-$corErro = imagecolorallocate($image, 200, 30, 30); // vermelho para palavras erradas
-$fonte = __DIR__ . '/roboto.ttf'; // Use uma fonte boa para centralizar corretamente
+$corTexto = imagecolorallocate($image, 101, 67, 33);         // marrom escuro
+$corErro  = imagecolorallocate($image, 200, 30, 30);         // vermelho
+$fonte    = __DIR__ . '/roboto.ttf';                     // Fonte recomendada
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
-// Função para escrever texto com estilo (negrito e strike vermelho)
+// Função para quebra de texto e renderização com estilos
 function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1000) {
     $palavras = explode(' ', $conteudo);
     $linha = '';
@@ -49,7 +49,7 @@ function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tam
     }
 }
 
-// Função para desenhar uma linha com estilos
+// Função para aplicar estilos na linha: *negrito* e ~riscado~
 function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto) {
     $corErro = imagecolorallocate($image, 200, 30, 30);
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -76,7 +76,7 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
             imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corTexto, $fonte, $texto);
         } elseif ($estilo === 'error') {
             imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corErro, $fonte, $texto);
-            $linhaY = $y - ($tamanhoFonte * 0.35); // linha mais centralizada
+            $linhaY = (int) ($y - ($tamanhoFonte * 0.35));
             imageline($image, $offsetX, $linhaY, $offsetX + $larguraTexto, $linhaY, $corErro);
         } else {
             imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
@@ -86,18 +86,18 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
     }
 }
 
-// Escrever os três blocos de conteúdo
-escreveTextoFormatadoComEstilo($msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
-escreveTextoFormatadoComEstilo($msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
-escreveTextoFormatadoComEstilo($score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
+// Escrever os textos
+escreveTextoFormatadoComEstilo($msgusuario,   $x,  $y,  $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
+escreveTextoFormatadoComEstilo($msgcorrigida, $x,  $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
+escreveTextoFormatadoComEstilo($score,        $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
 
-// Gerar imagem final em memória
+// Gerar imagem
 ob_start();
 imagepng($image);
 $imagemFinal = ob_get_clean();
 imagedestroy($image);
 
-// Enviar imagem
+// Enviar imagem para download
 header('Content-Type: image/png');
 header('Content-Disposition: attachment; filename="resposta_usuario.png"');
 header('Content-Length: ' . strlen($imagemFinal));
