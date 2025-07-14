@@ -11,7 +11,10 @@ $score = $_GET['score'] ?? '';
 
 $tamanhoFonte = isset($_GET['size']) ? intval($_GET['size']) : 12;
 $x = isset($_GET['x']) ? intval($_GET['x']) : 110;
-$y = isset($_GET['y']) ? intval($_GET['y']) : 500;
+$y = isset($_GET['y']) ? intval($_GET['y']) : 1000;
+$y2 = isset($_GET['y2']) ? intval($_GET['y2']) : 3000;
+$x3 = isset($_GET['x']) ? intval($_GET['x3']) : 500;
+$yy = isset($_GET['y']) ? intval($_GET['y3']) : 1000;
 
 $lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
 
@@ -32,9 +35,9 @@ function escreveBloco($titulo, $conteudo, &$x, &$y, $image, $fonte, $tamanhoFont
 }
 
 // Escrever blocos na imagem
-escreveBloco("🗣 Mensagem do Usuário:", $msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
-escreveBloco("✅ Correção:", $msgcorrigida, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
-escreveBloco("💡 Sugestão:", $sugestao, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
+escreveBloco("", $msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
+escreveBloco("", $msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
+escreveBloco("", $score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight);
 
 // Mostrar imagem na tela
 header('Content-Type: image/png');
