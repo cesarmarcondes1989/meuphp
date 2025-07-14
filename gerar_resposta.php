@@ -16,14 +16,15 @@ $y2 = isset($_GET['y2']) ? intval($_GET['y2']) : 1750;
 $x3 = isset($_GET['x3']) ? intval($_GET['x3']) : 1170;
 $y3 = isset($_GET['y3']) ? intval($_GET['y3']) : 515;
 
-$lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
+$lineHeight = $tamanhoFonte + 14;
 
-// Define cor e fonte
-$corTexto = imagecolorallocate($image, 101, 67, 33);
-$fonte = __DIR__ . '/ARIALN.TTF';
+// Define cores e fonte
+$corTexto = imagecolorallocate($image, 101, 67, 33); // marrom escuro
+$corErro = imagecolorallocate($image, 200, 30, 30); // vermelho para palavras erradas
+$fonte = __DIR__ . '/DejaVuSans.ttf'; // Use uma fonte boa para centralizar corretamente
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
-// Função para quebrar texto em múltiplas linhas com base em largura máxima e aplicar estilos
+// Função para escrever texto com estilo (negrito e strike vermelho)
 function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1000) {
     $palavras = explode(' ', $conteudo);
     $linha = '';
@@ -48,14 +49,11 @@ function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tam
     }
 }
 
-// Função para desenhar uma linha com estilos: *negrito* e ~riscado~
+// Função para desenhar uma linha com estilos
 function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto) {
+    $corErro = imagecolorallocate($image, 200, 30, 30);
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
     $offsetX = $x;
-
-    // Define cores adicionais
-    $corErro = imagecolorallocate($image, 200, 30, 30); // vermelho para erros
-    $corNegrito = $corTexto; // usa a mesma cor pro bold
 
     foreach ($parts as $parte) {
         $estilo = 'normal';
@@ -70,16 +68,16 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
             $texto = $parte;
         }
 
-        // Medir tamanho da palavra
         $bbox = imagettfbbox($tamanhoFonte, 0, $fonte, $texto);
         $larguraTexto = abs($bbox[2] - $bbox[0]);
 
-        // Desenhar com estilo
         if ($estilo === 'bold') {
-            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corNegrito, $fonte, $texto);
-            imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corNegrito, $fonte, $texto); // falso negrito
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
+            imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corTexto, $fonte, $texto);
         } elseif ($estilo === 'error') {
-            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corErro, $fonte, $texto); // palavra errada em vermelho
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corErro, $fonte, $texto);
+            $linhaY = $y - ($tamanhoFonte * 0.35); // linha mais centralizada
+            imageline($image, $offsetX, $linhaY, $offsetX + $larguraTexto, $linhaY, $corErro);
         } else {
             imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
         }
@@ -87,7 +85,6 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
         $offsetX += $larguraTexto + 8;
     }
 }
-
 
 // Escrever os três blocos de conteúdo
 escreveTextoFormatadoComEstilo($msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
@@ -100,12 +97,10 @@ imagepng($image);
 $imagemFinal = ob_get_clean();
 imagedestroy($image);
 
-// Mostrar imagem na tela
-// Mostrar imagem na tela
+// Enviar imagem
 header('Content-Type: image/png');
 header('Content-Disposition: attachment; filename="resposta_usuario.png"');
 header('Content-Length: ' . strlen($imagemFinal));
 echo $imagemFinal;
 exit;
 ?>
-
