@@ -53,6 +53,10 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
     $offsetX = $x;
 
+    // Define cores adicionais
+    $corErro = imagecolorallocate($image, 200, 30, 30); // vermelho para erros
+    $corNegrito = $corTexto; // usa a mesma cor pro bold
+
     foreach ($parts as $parte) {
         $estilo = 'normal';
 
@@ -61,7 +65,7 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
             $estilo = 'bold';
         } elseif (preg_match('/^~(.*?)~$/', $parte, $m)) {
             $texto = $m[1];
-            $estilo = 'strike';
+            $estilo = 'error';
         } else {
             $texto = $parte;
         }
@@ -72,25 +76,23 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
 
         // Desenhar com estilo
         if ($estilo === 'bold') {
-            // Negrito falso: desenha 2x com deslocamento
-            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
-            imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corTexto, $fonte, $texto);
-        } elseif ($estilo === 'strike') {
-            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
-            $linhaY = $y - $tamanhoFonte / 2;
-            imageline($image, $offsetX, $linhaY, $offsetX + $larguraTexto, $linhaY, $corTexto);
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corNegrito, $fonte, $texto);
+            imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corNegrito, $fonte, $texto); // falso negrito
+        } elseif ($estilo === 'error') {
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corErro, $fonte, $texto); // palavra errada em vermelho
         } else {
             imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
         }
 
-        $offsetX += $larguraTexto + 8; // espaço entre palavras
+        $offsetX += $larguraTexto + 8;
     }
 }
 
+
 // Escrever os três blocos de conteúdo
-escreveTextoFormatadoComEstilo($msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
-escreveTextoFormatadoComEstilo($msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
-escreveTextoFormatadoComEstilo($score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
+escreveTextoFormatadoComEstilo($msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
+escreveTextoFormatadoComEstilo($msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
+escreveTextoFormatadoComEstilo($score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
 
 // Gerar imagem final em memória
 ob_start();
