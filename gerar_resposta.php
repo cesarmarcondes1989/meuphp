@@ -3,11 +3,11 @@
 $imagemBase = 'resposta.png';
 $image = imagecreatefrompng($imagemBase);
 
-// Inputs via GET
-$msgusuario   = $_GET['msg_usuario'] ?? '';
-$msgcorrigida = $_GET['msg_corrigida'] ?? '';
-$sugestao     = $_GET['sugestao'] ?? '';
-$score        = $_GET['score'] ?? '';
+// Inputs via GET, já removendo barras/espaços no fim
+$msgusuario   = rtrim($_GET['msg_usuario']   ?? '', " \t\n\r\0\x0B\\/");
+$msgcorrigida = rtrim($_GET['msg_corrigida'] ?? '', " \t\n\r\0\x0B\\/");
+$sugestao     = rtrim($_GET['sugestao']      ?? '', " \t\n\r\0\x0B\\/");
+$score        = rtrim($_GET['score']         ?? '', " \t\n\r\0\x0B\\/");
 
 $tamanhoFonte = isset($_GET['size']) ? intval($_GET['size']) : 50;
 $x            = isset($_GET['x']) ? intval($_GET['x']) : 210;
@@ -19,39 +19,41 @@ $y3           = isset($_GET['y3']) ? intval($_GET['y3']) : 515;
 $lineHeight   = $tamanhoFonte + 14;
 
 // Define cores e fonte
-$corTexto = imagecolorallocate($image, 101, 67, 33);         // marrom escuro
-$corErro  = imagecolorallocate($image, 200, 30, 30);         // vermelho
-$fonte    = __DIR__ . '/roboto.ttf';                     // Fonte recomendada
+$corTexto = imagecolorallocate($image, 101, 67, 33);        // marrom escuro
+$corErro  = imagecolorallocate($image, 200, 30, 30);        // vermelho para erro
+$fonte    = __DIR__ . '/roboto.ttf';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
-// Função para quebra de texto e renderização com estilos
+// Função principal para escrever texto com estilo
 function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1000) {
-    $palavras = explode(' ', $conteudo);
+    // Divide por padrões e espaços
+    $parts = preg_split('/(\*[^*]+\*|~[^~]+~| )/', $conteudo, -1, PREG_SPLIT_DELIM_CAPTURE);
     $linha = '';
+    $linhaMedida = 0;
 
-    foreach ($palavras as $palavra) {
-        $teste = trim($linha . ' ' . $palavra);
+    foreach ($parts as $parte) {
+        $teste = $linha . $parte;
         $bbox = imagettfbbox($tamanhoFonte, 0, $fonte, $teste);
         $largura = abs($bbox[2] - $bbox[0]);
 
-        if ($largura > $maxWidth) {
-            desenhaLinhaComEstilo(trim($linha), $x, $y, $image, $fonte, $tamanhoFonte, $corTexto);
+        if ($largura > $maxWidth && $linha !== '') {
+            desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto);
             $y += $lineHeight;
-            $linha = $palavra;
+            $linha = trim($parte);
         } else {
-            $linha .= ' ' . $palavra;
+            $linha .= $parte;
         }
     }
 
     if (!empty($linha)) {
-        desenhaLinhaComEstilo(trim($linha), $x, $y, $image, $fonte, $tamanhoFonte, $corTexto);
+        desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto);
         $y += $lineHeight;
     }
 }
 
-// Função para aplicar estilos na linha: *negrito* e ~riscado~
+// Aplica estilo individual em cada parte (negrito, risco)
 function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto) {
-    $corErro = imagecolorallocate($image, 200, 30, 30);
+    $corErro = imagecolorallocate($image, 200, 30, 30); // vermelho
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
     $offsetX = $x;
 
@@ -86,7 +88,7 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
     }
 }
 
-// Escrever os textos
+// Escreve os três blocos
 escreveTextoFormatadoComEstilo($msgusuario,   $x,  $y,  $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
 escreveTextoFormatadoComEstilo($msgcorrigida, $x,  $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
 escreveTextoFormatadoComEstilo($score,        $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
