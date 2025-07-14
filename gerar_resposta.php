@@ -29,7 +29,7 @@ $fonte    = __DIR__ . '/roboto.ttf';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
 // Função principal para escrever texto com estilo
-function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1000) {
+function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1200) {
     // Divide por padrões e espaços
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~| )/', $conteudo, -1, PREG_SPLIT_DELIM_CAPTURE);
     $linha = '';
@@ -93,9 +93,9 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
 }
 
 // Escreve os três blocos
-escreveTextoFormatadoComEstilo($msgusuario,   $x,  $y,  $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
-escreveTextoFormatadoComEstilo($msgcorrigida, $x,  $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
-escreveTextoFormatadoComEstilo($score,        $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1100);
+escreveTextoFormatadoComEstilo($msgusuario,   $x,  $y,  $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1200);
+escreveTextoFormatadoComEstilo($msgcorrigida, $x,  $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1200);
+escreveTextoFormatadoComEstilo($score,        $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1200);
 
 // Gerar imagem
 ob_start();
