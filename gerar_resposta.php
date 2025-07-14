@@ -3,11 +3,15 @@
 $imagemBase = 'resposta.png';
 $image = imagecreatefrompng($imagemBase);
 
-// Inputs via GET, já removendo barras/espaços no fim
-$msgusuario   = rtrim($_GET['msg_usuario']   ?? '', " \t\n\r\0\x0B\\/");
-$msgcorrigida = rtrim($_GET['msg_corrigida'] ?? '', " \t\n\r\0\x0B\\/");
-$sugestao     = rtrim($_GET['sugestao']      ?? '', " \t\n\r\0\x0B\\/");
-$score        = rtrim($_GET['score']         ?? '', " \t\n\r\0\x0B\\/");
+function limpar($texto) {
+    return rtrim(stripslashes(trim($texto)), "\\/");
+}
+
+$msgusuario   = limpar($_GET['msg_usuario']   ?? '');
+$msgcorrigida = limpar($_GET['msg_corrigida'] ?? '');
+$sugestao     = limpar($_GET['sugestao']      ?? '');
+$score        = limpar($_GET['score']         ?? '');
+
 
 $tamanhoFonte = isset($_GET['size']) ? intval($_GET['size']) : 50;
 $x            = isset($_GET['x']) ? intval($_GET['x']) : 210;
