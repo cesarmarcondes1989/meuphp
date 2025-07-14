@@ -17,7 +17,7 @@ $lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
 
 // Define cor e fonte
 $corTexto = imagecolorallocate($image, 101, 67, 33);
-$fonte = __DIR__ . '/ARIALN.ttf';
+$fonte = __DIR__ . '/ARIALN.TTF';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
 // Função auxiliar para escrever texto com quebra de linha automática
