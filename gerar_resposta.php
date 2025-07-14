@@ -13,8 +13,8 @@ $tamanhoFonte = isset($_GET['size']) ? intval($_GET['size']) : 12;
 $x = isset($_GET['x']) ? intval($_GET['x']) : 110;
 $y = isset($_GET['y']) ? intval($_GET['y']) : 1000;
 $y2 = isset($_GET['y2']) ? intval($_GET['y2']) : 3000;
-$x3 = isset($_GET['x']) ? intval($_GET['x3']) : 500;
-$yy = isset($_GET['y']) ? intval($_GET['y3']) : 1000;
+$x3 = isset($_GET['x3']) ? intval($_GET['x3']) : 500;
+$yy = isset($_GET['y3']) ? intval($_GET['y3']) : 1000;
 
 $lineHeight = $tamanhoFonte + 14; // altura entre linhas adaptativa
 
