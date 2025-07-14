@@ -1,6 +1,6 @@
 <?php
 // Carrega a imagem base
-$imagemBase = 'resposta.png';
+$imagemBase = 'resposta_nova.png';
 $image = imagecreatefrompng($imagemBase);
 
 // Dados recebidos por GET
