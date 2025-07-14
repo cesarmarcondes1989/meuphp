@@ -23,11 +23,11 @@ $corTexto = imagecolorallocate($image, 101, 67, 33);
 $fonte = __DIR__ . '/ARIALN.TTF';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
 
-// Função segura para escrever blocos de texto
+// Função para quebrar texto em múltiplas linhas com base em largura máxima e aplicar estilos
 function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, $maxWidth = 1000) {
     $palavras = explode(' ', $conteudo);
     $linha = '';
-    
+
     foreach ($palavras as $palavra) {
         $teste = trim($linha . ' ' . $palavra);
         $bbox = imagettfbbox($tamanhoFonte, 0, $fonte, $teste);
@@ -48,9 +48,8 @@ function escreveTextoFormatadoComEstilo($conteudo, $x, &$y, $image, $fonte, $tam
     }
 }
 
-// Essa função desenha a linha interpretando *negrito* e ~risco~
+// Função para desenhar uma linha com estilos: *negrito* e ~riscado~
 function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto) {
-    // Divide a linha em partes com ou sem estilo
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
     $offsetX = $x;
 
@@ -78,7 +77,6 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
             imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corTexto, $fonte, $texto);
         } elseif ($estilo === 'strike') {
             imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corTexto, $fonte, $texto);
-            // Desenha risco no meio da palavra
             $linhaY = $y - $tamanhoFonte / 2;
             imageline($image, $offsetX, $linhaY, $offsetX + $larguraTexto, $linhaY, $corTexto);
         } else {
@@ -89,15 +87,20 @@ function desenhaLinhaComEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $c
     }
 }
 
-
-// Escrever blocos na imagem
+// Escrever os três blocos de conteúdo
 escreveTextoFormatadoComEstilo($msgusuario, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
 escreveTextoFormatadoComEstilo($msgcorrigida, $x, $y2, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
-escreveTextoFormatadoComEstilo($msgcorrigida, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
+escreveTextoFormatadoComEstilo($score, $x3, $y3, $image, $fonte, $tamanhoFonte, $corTexto, $lineHeight, 1000);
+
+// Gerar imagem final em memória
+ob_start();
+imagepng($image);
+$imagemFinal = ob_get_clean();
+imagedestroy($image);
 
 // Mostrar imagem na tela
 header('Content-Type: image/png');
-header('Content-Disposition: attachment; filename="resposta_usuario.png"');
+header('Content-Disposition: inline; filename="resposta_usuario.png"');
 header('Content-Length: ' . strlen($imagemFinal));
 echo $imagemFinal;
 exit;
