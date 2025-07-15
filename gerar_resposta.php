@@ -10,10 +10,10 @@ $blocos = [
 ];
 $score = $_GET['score'] ?? '';
 $tamanhoFonte = $_GET['size'] ?? 50;
-$tamanhoFonte_s = $_GET['size_s'] ?? 70;
-$x_s = $_GET['x_s'] ?? 1000;
-$y_s = $_GET['y_s'] ?? 500;
-$x = $_GET['x'] ?? 210;
+$tamanhoFonte_s = $_GET['size_s'] ?? 110;
+$x_s = $_GET['x_s'] ?? 980;
+$y_s = $_GET['y_s'] ?? 343;
+$x = $_GET['x'] ?? 180;
 $y = $_GET['y'] ?? 700;
 $lineHeight = $tamanhoFonte + 14;
 
@@ -21,6 +21,7 @@ $fonte = __DIR__ . '/roboto.ttf';
 if (!file_exists($fonte)) die("❌ Fonte não encontrada!");
 
 $corTexto = imagecolorallocate($image, 101, 67, 33); // marrom
+$corScore = imagecolorallocate($image, 112, 48, 160); // marrom
 $corErro  = imagecolorallocate($image, 200, 30, 30); // vermelho
 
 function escreveTextoFormatado($titulo, $texto, &$x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight, $maxWidth = 1100) {
@@ -53,7 +54,7 @@ function escreveTextoFormatado($titulo, $texto, &$x, &$y, $image, $fonte, $taman
         $y += $lineHeight;
     }
 
-    $y += 55; // espaço entre blocos
+    $y += 75; // espaço entre blocos
 }
 
 function desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro) {
@@ -98,7 +99,7 @@ function desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corT
 foreach ($blocos as $bloco) {
     escreveTextoFormatado($bloco['titulo'], $bloco['texto'], $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight);
 }
-escreveTextoFormatado('', $score, $x_s, $y_s, $image, $fonte, $tamanhoFonte_s, $corTexto, $corErro, $lineHeight);
+escreveTextoFormatado('', $score, $x_s, $y_s, $image, $fonte, $tamanhoFonte_s, $corScore, $corErro, $lineHeight);
 
 // Saída
 ob_start();
