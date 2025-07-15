@@ -1,40 +1,35 @@
 <?php
-// Carrega a imagem base
 $imagemBase = 'resposta_nova.png';
 $image = imagecreatefrompng($imagemBase);
 
-// Dados recebidos por GET
-$msgusuario   = $_GET['msg_usuario'] ?? '';
-$msgcorrigida = $_GET['msg_corrigida'] ?? '';
-$sugestao     = $_GET['sugestao'] ?? '';
-$score        = $_GET['score'] ?? '';
+// Inputs
+$blocos = [
+    ['titulo' => 'Message', 'texto' => $_GET['msg_usuario'] ?? ''],
+    ['titulo' => 'IA Recommendation',  'texto' => $_GET['msg_corrigida'] ?? ''],
+    ['titulo' => 'Suggestion',     'texto' => $_GET['msg_sugestao'] ?? '']
+];
 
-// Parâmetros visuais
-$tamanhoFonteTexto  = 44;
-$tamanhoFonteTitulo = 64;
-$xInicial           = 210;
-$y                  = 300;
-$lineHeightTexto    = $tamanhoFonteTexto + 16;
-$lineHeightTitulo   = $tamanhoFonteTitulo + 22;
-$maxWidth           = 1100;
+$tamanhoFonte = $_GET['size'] ?? 50;
+$x = $_GET['x'] ?? 210;
+$y = $_GET['y'] ?? 700;
+$lineHeight = $tamanhoFonte + 14;
 
-// Cores
-$corTexto   = imagecolorallocate($image, 101, 67, 33);
-$corTitulo  = imagecolorallocate($image, 0, 0, 0);
-$corErro    = imagecolorallocate($image, 200, 30, 30);
-
-// Fonte
 $fonte = __DIR__ . '/roboto.ttf';
-if (!file_exists($fonte)) die("❌ Fonte não encontrada em: $fonte");
+if (!file_exists($fonte)) die("❌ Fonte não encontrada!");
 
-// --- Funções ---
-function escreveTitulo($texto, &$y, $image, $fonte, $tamanho, $cor, $x) {
-    imagettftext($image, $tamanho, 0, $x, $y, $cor, $fonte, $texto);
-    $y += $tamanho + 20;
-}
+$corTexto = imagecolorallocate($image, 101, 67, 33); // marrom
+$corErro  = imagecolorallocate($image, 200, 30, 30); // vermelho
 
-function escreveTextoFormatado($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight, $maxWidth = 1000) {
-    $palavras = explode(' ', $conteudo);
+function escreveTextoFormatado($titulo, $texto, &$x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight, $maxWidth = 1100) {
+    // Título
+    imagettftext($image, $tamanhoFonte + 10, 0, $x, $y, $corTexto, $fonte, $titulo);
+    $y += $lineHeight + 10;
+
+    // Limpar barra final
+    $texto = preg_replace('/\\\\$/', '', $texto);
+    $texto = preg_replace('/\\\\\./', '.', $texto);
+
+    $palavras = explode(' ', $texto);
     $linha = '';
 
     foreach ($palavras as $palavra) {
@@ -43,78 +38,73 @@ function escreveTextoFormatado($conteudo, $x, &$y, $image, $fonte, $tamanhoFonte
         $largura = abs($bbox[2] - $bbox[0]);
 
         if ($largura > $maxWidth) {
-            desenhaLinhaFormatada(trim($linha), $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro);
+            desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro);
             $y += $lineHeight;
             $linha = $palavra;
         } else {
             $linha .= ' ' . $palavra;
         }
     }
-
     if (!empty($linha)) {
-        desenhaLinhaFormatada(trim($linha), $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro);
+        desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro);
         $y += $lineHeight;
     }
+
+    $y += 40; // espaço entre blocos
 }
 
-function desenhaLinhaFormatada($linha, $x, $y, $image, $fonte, $tamanho, $corTexto, $corErro) {
+function desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro) {
     $parts = preg_split('/(\*[^*]+\*|~[^~]+~)/', $linha, -1, PREG_SPLIT_DELIM_CAPTURE);
     $offsetX = $x;
 
     foreach ($parts as $parte) {
         $estilo = 'normal';
+        $corAtual = $corTexto;
 
         if (preg_match('/^\*(.*?)\*$/', $parte, $m)) {
             $texto = $m[1];
             $estilo = 'bold';
         } elseif (preg_match('/^~(.*?)~$/', $parte, $m)) {
             $texto = $m[1];
-            $estilo = 'error';
+            $estilo = 'strike';
+            $corAtual = $corErro;
         } else {
             $texto = $parte;
         }
 
-        $bbox = imagettfbbox($tamanho, 0, $fonte, $texto);
+        $bbox = imagettfbbox($tamanhoFonte, 0, $fonte, $texto);
         $larguraTexto = abs($bbox[2] - $bbox[0]);
 
+        // Estilos
         if ($estilo === 'bold') {
-            imagettftext($image, $tamanho, 0, $offsetX, $y, $corTexto, $fonte, $texto);
-            imagettftext($image, $tamanho, 0, $offsetX + 1, $y, $corTexto, $fonte, $texto);
-        } elseif ($estilo === 'error') {
-            imagettftext($image, $tamanho, 0, $offsetX, $y, $corErro, $fonte, $texto);
-            $linhaY = (int) ($y - ($tamanho * 0.35));
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corAtual, $fonte, $texto);
+            imagettftext($image, $tamanhoFonte, 0, $offsetX + 1, $y, $corAtual, $fonte, $texto);
+        } elseif ($estilo === 'strike') {
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corAtual, $fonte, $texto);
+            $linhaY = (int) ($y - ($tamanhoFonte * 0.35));
             imageline($image, $offsetX, $linhaY, $offsetX + $larguraTexto, $linhaY, $corErro);
         } else {
-            imagettftext($image, $tamanho, 0, $offsetX, $y, $corTexto, $fonte, $texto);
+            imagettftext($image, $tamanhoFonte, 0, $offsetX, $y, $corAtual, $fonte, $texto);
         }
 
         $offsetX += $larguraTexto + 8;
     }
 }
 
-// --- CONTEÚDO DINÂMICO ---
+// Escrever blocos
+foreach ($blocos as $bloco) {
+    escreveTextoFormatado($bloco['titulo'], $bloco['texto'], $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight);
+}
 
-// Bloco 1 - Pronúncia
-escreveTitulo("Your message", $y, $image, $fonte, $tamanhoFonteTitulo, $corTitulo, $xInicial);
-escreveTextoFormatado($msgusuario, $xInicial, $y, $image, $fonte, $tamanhoFonteTexto, $corTexto, $corErro, $lineHeightTexto, $maxWidth);
-
-// Bloco 2 - Sugestão
-escreveTitulo("Attention", $y, $image, $fonte, $tamanhoFonteTitulo, $corTitulo, $xInicial);
-escreveTextoFormatado($msgcorrigida, $xInicial, $y, $image, $fonte, $tamanhoFonteTexto, $corTexto, $corErro, $lineHeightTexto, $maxWidth);
-
-// Bloco 3 - Pontuação
-escreveTitulo("Suggestion", $y, $image, $fonte, $tamanhoFonteTitulo, $corTitulo, $xInicial);
-escreveTextoFormatado($msgcorrigida, $xInicial, $y, $image, $fonte, $tamanhoFonteTexto, $corTexto, $corErro, $lineHeightTexto, $maxWidth);
-
-// --- Saída final ---
+// Saída
 ob_start();
 imagepng($image);
 $imagemFinal = ob_get_clean();
 imagedestroy($image);
 
 header('Content-Type: image/png');
-header('Content-Disposition: attachment; filename="feedback_usuario.png"');
+header('Content-Disposition: attachment; filename="resposta_usuario.png"');
 header('Content-Length: ' . strlen($imagemFinal));
 echo $imagemFinal;
 exit;
-
+?>
