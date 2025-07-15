@@ -8,8 +8,11 @@ $blocos = [
     ['titulo' => 'IA Recommendation',  'texto' => $_GET['msg_corrigida'] ?? ''],
     ['titulo' => 'Suggestion',     'texto' => $_GET['msg_sugestao'] ?? '']
 ];
-
+$score = $_GET['score'] ?? '';
 $tamanhoFonte = $_GET['size'] ?? 50;
+$tamanhoFonte_s = $_GET['size_s'] ?? 70;
+$x_s = $_GET['x_s'] ?? 1000;
+$y_s = $_GET['y_s'] ?? 500;
 $x = $_GET['x'] ?? 210;
 $y = $_GET['y'] ?? 700;
 $lineHeight = $tamanhoFonte + 14;
@@ -95,6 +98,7 @@ function desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corT
 foreach ($blocos as $bloco) {
     escreveTextoFormatado($bloco['titulo'], $bloco['texto'], $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight);
 }
+escreveTextoFormatado('', $score, $x_s, $y_s, $image, $fonte, $tamanhoFonte_s, $corTexto, $corErro, $lineHeight);
 
 // Saída
 ob_start();
