@@ -23,7 +23,7 @@ $corErro  = imagecolorallocate($image, 200, 30, 30); // vermelho
 function escreveTextoFormatado($titulo, $texto, &$x, &$y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro, $lineHeight, $maxWidth = 1100) {
     // Título
     imagettftext($image, $tamanhoFonte + 10, 0, $x, $y, $corTexto, $fonte, $titulo);
-    $y += $lineHeight + 10;
+    $y += $lineHeight + 12;
 
     // Limpar barra final
     $texto = preg_replace('/\\\\$/', '', $texto);
@@ -50,7 +50,7 @@ function escreveTextoFormatado($titulo, $texto, &$x, &$y, $image, $fonte, $taman
         $y += $lineHeight;
     }
 
-    $y += 40; // espaço entre blocos
+    $y += 55; // espaço entre blocos
 }
 
 function desenhaLinhaEstilo($linha, $x, $y, $image, $fonte, $tamanhoFonte, $corTexto, $corErro) {
