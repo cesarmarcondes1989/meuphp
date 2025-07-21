@@ -4,11 +4,11 @@ $image = imagecreatefrompng($imagemBase);
 
 // Inputs
 $blocos = [
-    ['titulo' => 't', 'texto' => $_GET['msg_apoio'] ?? ''],
-    ['titulo' => 'Message', 'texto' => $_GET['msg_usuario'] ?? ''],
-    ['titulo' => 'IA Recommendation',  'texto' => $_GET['msg_corrigida'] ?? ''],
-    ['titulo' => 'Suggestion',     'texto' => $_GET['msg_sugestao'] ?? ''],
-    ['titulo' => 't', 'texto' => $_GET['msg_final'] ?? '']
+    ['titulo' => '', 'texto' => $_GET['msg_apoio'] ?? ''],
+    ['titulo' => 'Your Message', 'texto' => $_GET['msg_usuario'] ?? ''],
+    ['titulo' => 'Recommendation',  'texto' => $_GET['msg_corrigida'] ?? ''],
+    ['titulo' => 'Good Practices',     'texto' => $_GET['msg_sugestao'] ?? ''],
+    ['titulo' => '', 'texto' => $_GET['msg_final'] ?? '']
 ];
 $score = $_GET['score'] ?? '';
 $tamanhoFonte = $_GET['size'] ?? 50;
