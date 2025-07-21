@@ -16,7 +16,7 @@ $tamanhoFonte_s = $_GET['size_s'] ?? 110;
 $x_s = $_GET['x_s'] ?? 980;
 $y_s = $_GET['y_s'] ?? 343;
 $x = $_GET['x'] ?? 180;
-$y = $_GET['y'] ?? 700;
+$y = $_GET['y'] ?? 650;
 $lineHeight = $tamanhoFonte + 14;
 
 $fonte = __DIR__ . '/roboto.ttf';
